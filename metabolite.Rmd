@@ -1,0 +1,99 @@
+
+
+#Importing libraries
+```{r}
+library(pheatmap)
+library(ggplot2)
+library(factoextra)
+```
+
+```{r}
+data1 = read.csv("Data metabiloites 12-05-24.csv",sep = ",")  # Original data
+```
+
+
+```{r}
+head(data1)
+```
+
+```{r}
+data = read.csv2("Data metabiloites 12-05-24.csv",sep = ",",row.names = 1) # modified data
+```
+
+```{r}
+data
+```
+The columns was character so I had to change their data types to numeric
+
+```{r}
+data$HWHS = as.numeric(data$HWHS)
+data$HSLW = as.numeric(data$HSLW)
+data$LSHW = as.numeric(data$LSHW)
+data$LSLW = as.numeric(data$LSLW)
+```
+```{r}
+data
+```
+
+```{r}
+dim(data)
+```
+```{r}
+data_mat = t(data)
+
+corr = cor(data_mat)
+```
+
+```{r}
+pheatmap(data_mat,fontsize_row = 7 ,fontsize_col = 7,main = "Correlation between Metabolites & Treatments")
+```
+This heat map shows the correlation between treatmen and metabolites
+
+
+```{r}
+pheatmap(corr,fontsize_row = 7 ,fontsize_col = 7,main = "Correlation between Metabolites in our data")
+```
+This heat map shows the correlation between the metabolites, We could see the that the group on the upper left side are strongly correlated with each other.
+
+
+Preparing the data for the principal component analysis
+
+
+We need to exclude the categorical variable to be able to calculate the PCA
+
+```{r}
+head(data1)
+```
+Exclude the Sample column
+
+```{r}
+sample = data1[,-1]
+```
+
+
+```{r}
+sample
+```
+
+
+```{r}
+my_pca = prcomp(sample,scale= TRUE)
+```
+
+
+```{r}
+my_pca
+```
+
+we will use ggbiplot
+```{r}
+library(ggbiplot)
+library(ggplot2)
+```
+
+
+```{r}
+ggbiplot(my_pca,obs.scale = 1 ,var.scale = 3 ,groups = colnames(data_mat),ellipse = TRUE,circle = TRUE,ellipse.prob = 0.50,point.size = 2,var.axes = FALSE,varname.abbrev = TRUE)+ggtitle("This graph study the variation of our Metabolites according to treatment")+theme(text = element_text(size = 10))
+```
+
+The graph abouve shows the variation in metabolites according to the type of treatment
